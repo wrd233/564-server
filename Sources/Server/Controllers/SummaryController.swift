@@ -23,37 +23,14 @@ struct SummaryController: RouteCollection {
             throw Abort(.internalServerError, reason: "API configuration error")
         }
         
-        // 创建OpenAI API请求
-        let openAIRequest = OpenAIRequest(
-            model: "gpt-3.5-turbo",
-            messages: [
-                .init(role: "system", content: "You are a helpful assistant that generates concise summaries."),
-                .init(role: "user", content: "Please summarize the following text in a concise manner: \(summaryRequest.text)")
-            ],
-            temperature: 0.7,
-            max_tokens: 300
+        // 使用OpenAI服务处理文本
+        let summary = try await req.openAI.processText(
+            apiKey: apiKey,
+            systemPrompt: "You are a helpful assistant that generates concise summaries.",
+            userPrompt: "Please summarize the following text in a concise manner: \(summaryRequest.text)"
         )
         
-        // 发送请求到OpenAI API
-        let openAIResponse = try await req.client.post("https://api.openai.com/v1/chat/completions") { req in
-            req.headers.bearerAuthorization = BearerAuthorization(token: apiKey)
-            req.headers.contentType = .json
-            try req.content.encode(openAIRequest)
-        }
-        
-        // 处理OpenAI API响应
-        do {
-            let response = try openAIResponse.content.decode(OpenAIResponse.self)
-            
-            guard let content = response.choices.first?.message.content else {
-                throw Abort(.internalServerError, reason: "Failed to get summary from OpenAI")
-            }
-            
-            // 返回摘要响应
-            return SummaryResponseDTO(summary: content)
-        } catch {
-            req.logger.error("Failed to decode OpenAI response: \(error)")
-            throw Abort(.internalServerError, reason: "Failed to process the summary: \(error)")
-        }
+        // 返回摘要响应
+        return SummaryResponseDTO(summary: summary)
     }
 }

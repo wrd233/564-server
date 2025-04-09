@@ -1,15 +1,5 @@
 import Vapor
 
-// 用于接收用户请求的DTO
-struct SummaryRequestDTO: Content {
-    var text: String
-}
-
-// 用于返回摘要结果的DTO
-struct SummaryResponseDTO: Content {
-    var summary: String
-}
-
 // OpenAI API请求数据结构
 struct OpenAIRequest: Content {
     var model: String
