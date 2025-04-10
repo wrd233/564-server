@@ -42,3 +42,13 @@ struct ReportResponseDTO: Content {
     /// 报告生成时间
     var generatedAt: Date
 }
+
+// 接收请求的DTO
+struct TextProcessorRequestDTO: Content {
+    var text: String
+}
+
+// 返回响应的DTO
+struct TextProcessorResponseDTO: Content {
+    var processedText: String
+}

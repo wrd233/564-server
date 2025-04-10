@@ -22,8 +22,8 @@ struct OpenAIService {
         apiKey: String,
         systemPrompt: String,
         userPrompt: String,
-        model: String = "gpt-3.5-turbo",
-        maxTokens: Int = 300
+        model: String = "gpt-4o-2024-08-06",
+        maxTokens: Int = 10000
     ) async throws -> String {
         // 创建OpenAI API请求
         let openAIRequest = OpenAIRequest(
