@@ -2,10 +2,10 @@ import Vapor
 
 /// 服务类，封装与OpenAI API的交互
 struct OpenAIService {
-    let client: Client
+    let client: any Client
     let logger: Logger
     
-    init(client: Client, logger: Logger) {
+    init(client: any Client, logger: Logger) {
         self.client = client
         self.logger = logger
     }

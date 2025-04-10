@@ -13,4 +13,5 @@ func routes(_ app: Application) throws {
     try app.register(collection: TodoController())
     try app.register(collection: SummaryController())
     try app.register(collection: ReportController())
+    try app.register(collection: HTMLConverterController())
 }
