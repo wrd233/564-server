@@ -36,6 +36,9 @@ struct OpenAIService {
             max_tokens: maxTokens
         )
         
+        // Log request details for debugging (without sensitive information)
+        logger.debug("Sending request to OpenAI API with model: \(model)")
+        
         // 发送请求到OpenAI API
         let openAIResponse = try await client.post("https://api.openai.com/v1/chat/completions") { req in
             req.headers.bearerAuthorization = BearerAuthorization(token: apiKey)
@@ -43,17 +46,31 @@ struct OpenAIService {
             try req.content.encode(openAIRequest)
         }
         
+        // For debugging, log the raw response
+        if let body = openAIResponse.body {
+            let responseString = String(buffer: body)
+            logger.debug("Raw OpenAI response: \(responseString)")
+        }
+        
         // 处理OpenAI API响应
         do {
             let response = try openAIResponse.content.decode(OpenAIResponse.self)
             
-            guard let content = response.choices.first?.message.content else {
+            guard let firstChoice = response.choices.first,
+                  !firstChoice.message.content.isEmpty else {
                 throw Abort(.internalServerError, reason: "Failed to get content from OpenAI")
             }
             
-            return content
+            return firstChoice.message.content
         } catch {
             logger.error("Failed to decode OpenAI response: \(error)")
+            
+            // If we can access the response body, log it to help with debugging
+            if let body = openAIResponse.body {
+                let responseString = String(buffer: body)
+                logger.error("Response body: \(responseString)")
+            }
+            
             throw Abort(.internalServerError, reason: "Failed to process text: \(error)")
         }
     }
